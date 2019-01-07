@@ -1,0 +1,5 @@
+0,10	Recv B18_2_1: (init B18_2 (version 9) (goalie))
+0,10	Recv B18_1: (init B18 (version 9) (goalie))
+0,86	(referee kick_off_l)
+13,0	(referee drop_ball)
+13,0	(referee play_on)
