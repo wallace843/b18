@@ -87,7 +87,7 @@ public class HabilidadeJogador {
 			if(intervalo == Double.MAX_VALUE)
 				pontoFuturo = PFABola;
 			else {
-				double espacoPercorrido = velBola.magnitude()*intervalo - 0.02*Math.pow(intervalo, 2)/2;
+				double espacoPercorrido = velBola.magnitude()*intervalo - 0.01*Math.pow(intervalo, 2)/2;
 				//espacoPercorridoParada = espacoPercorridoParada*7/10;
 				pontoFuturo = velBola.multiply(espacoPercorrido/(velBola.magnitude()));
 				pontoFuturo = posicaoBola.sum(pontoFuturo);	
@@ -109,7 +109,7 @@ public class HabilidadeJogador {
 		vA = 1d;
 		vB = velBola.magnitude();
 		csTeta = (x1*x2 + y1*y2)/(Math.sqrt(Math.pow(x2, 2)+Math.pow(y2, 2))*Math.sqrt(Math.pow(x1, 2)+Math.pow(y1, 2)));
-		ac = -0.02;//desaceleracaoBola;//desaceleracaoBola;
+		ac = -0.01;//desaceleracaoBola;//desaceleracaoBola;
 		dis = playerPerception.getPosition().distanceTo(posBola);
 		
 		double a, b, c, d, e;
@@ -273,12 +273,15 @@ public class HabilidadeJogador {
 	public void correrParaPonto(Vector2D ponto) {
 		double distancia = playerPerception.getPosition().distanceTo(ponto);
 		if(distancia > 0.7) {
-			if (!estaAlinhadoPonto(ponto, 15)) 
-				virarParaPonto(ponto);
 			double intensidade = 100;
 			if(distancia < 10)
 				intensidade = intensidade - 40 + (40*distancia)/10;
-			commander.doDash(intensidade);
+			if (!estaAlinhadoPonto(ponto, 15)) { 
+				virarParaPonto(ponto);
+				commander.doDashBlocking(intensidade);
+			}
+			else
+				commander.doDash(intensidade);
 		}
 		else
 			commander.doKick(10, 0);

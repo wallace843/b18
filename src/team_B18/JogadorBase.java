@@ -41,7 +41,7 @@ public class JogadorBase {
 	
 	public void beforeKickOffAcao() {}
 	
-	public void playOnAcao() {
+	public void playOnAcao() {/*
 		switch (ESTADO) {
 		case CHUTAR_BOLA:
 			estadoChutarBola();
@@ -62,7 +62,7 @@ public class JogadorBase {
 			break;
 		default:
 			break;
-		}
+		}*/
 	}
 	
 	public void kickOffLeftAcao() {

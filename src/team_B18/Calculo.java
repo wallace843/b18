@@ -1,5 +1,7 @@
 package team_B18;
 
+import java.util.Vector;
+
 public class Calculo {
 	
 	public Complex[] equacaoQuarto(double a, double b, double c, double d, double e) {
@@ -226,6 +228,7 @@ public class Calculo {
 			return real;
 		}
 
+		
 		public double getImaginario() {
 			return imaginario;
 		}
