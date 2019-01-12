@@ -225,7 +225,7 @@ public class HabilidadeJogador {
 	}
 	
 	public EFieldSide ladoCampo() {
-		return commander.getFieldSide();
+		return commander.perceiveSelf().getSide();
 	}
 	
 	public void virarParaPonto(Vector2D point){
@@ -244,7 +244,7 @@ public class HabilidadeJogador {
 		double pesoPontoJogador = 3;
 		double pesoPontoJogadorOutros = 25;
 		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros;
-		EFieldSide lado = commander.getFieldSide();
+		EFieldSide lado = commander.perceiveSelf().getSide();
 		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
 		Vector2D ballPos = fieldPerception.getBall().getPosition();
 		Vector2D posicao = null;

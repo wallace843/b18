@@ -25,6 +25,7 @@ public class HabilidadeJogador {
 	private Vector2D PFABola;
 	private long time;
 	
+	// construtor
 	public HabilidadeJogador(PlayerCommander commander) {
 		this.posicoes = new Vector2D[77];
 		int i = 0;
@@ -41,14 +42,17 @@ public class HabilidadeJogador {
 		this.time = System.currentTimeMillis();
 	}
 	
+	// posição da bola
 	public Vector2D getPosBola() {
 		return posBola;
 	}
-
+	
+	// velocidade da bola
 	public Vector2D getVelBola() {
 		return velBola;
 	}
 
+	// atualiza percepções próprias e do campo
 	public void atualizarPercepcoes() {
 		playerPerception = commander.perceiveSelfBlocking();
 		fieldPerception = commander.perceiveFieldBlocking();
@@ -59,6 +63,7 @@ public class HabilidadeJogador {
 		time = System.currentTimeMillis() - time;
 	}
 	
+	// obtém o ponto de interceptação da bola v1
 	public Vector2D pegarPontoFuturo() {
 		Vector2D pontoFuturo = null;
 		Vector2D posicaoBola = posBola;
@@ -75,7 +80,7 @@ public class HabilidadeJogador {
 		return pontoFuturo;
 	}
 	
-
+	// obtém o ponto de interceptação da bola v2
 	public Vector2D pontoFuturo() {
 		Vector2D pontoFuturo = null;
 		Vector2D posicaoBola = posBola;
@@ -99,6 +104,7 @@ public class HabilidadeJogador {
 		return pontoFuturo;
 	}
 	
+	// obtém o tempo necessário para interceptar a bola
 	private double intervaloInterceptacao() {
 		double tempo = Double.MAX_VALUE, vA, vB, csTeta, ac, dis;
 		double x1 = playerPerception.getPosition().sub(posBola).getX();
@@ -136,7 +142,8 @@ public class HabilidadeJogador {
 		
 		return tempo;
 	}
-	
+
+	// corre para o ponto de interceptação da bola
 	public void correrPontoFuturo() {
 		Vector2D velocidade = velBola;
 		Vector2D posicaoBola = posBola;
@@ -247,10 +254,15 @@ public class HabilidadeJogador {
 		}
 	}
 	
-	public void passarBola(Vector2D ponto) {
+	public void passarBola(Vector2D ponto, boolean ajeitar) {
 		double relativeAngle = ponto.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection());
 		double deslocamento = playerPerception.getPosition().distanceTo(ponto);
 		double intensity = (deslocamento*CONST_PASSE);
+		if (ajeitar) {
+			if(pegarJogadorPerto(posBola, EFieldSide.invert(ladoCampo()), true).getPosition().distanceTo(posBola) > 5)
+				intensity = 5;
+		}
+		else
 		if (intensity > 100)
 			intensity = 100;
 		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT))
@@ -274,11 +286,12 @@ public class HabilidadeJogador {
 		double distancia = playerPerception.getPosition().distanceTo(ponto);
 		if(distancia > 0.7) {
 			double intensidade = 100;
-			if(distancia < 10)
-				intensidade = intensidade - 40 + (40*distancia)/10;
+			if(distancia < 15)
+				intensidade = intensidade - 40 + (40*distancia)/15;
 			if (!estaAlinhadoPonto(ponto, 15)) { 
 				virarParaPonto(ponto);
-				commander.doDashBlocking(intensidade);
+				if (velBola.magnitude() != 0)
+					commander.doDashBlocking(intensidade);
 			}
 			else
 				commander.doDash(intensidade);
@@ -300,7 +313,7 @@ public class HabilidadeJogador {
 	}
 	
 	public EFieldSide ladoCampo() {
-		return commander.getFieldSide();
+		return getPlayerPerception().getSide();
 	}
 	
 	public void virarParaPonto(Vector2D point){
@@ -319,7 +332,7 @@ public class HabilidadeJogador {
 		double pesoPontoJogador = 3;
 		double pesoPontoJogadorOutros = 25;
 		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros;
-		EFieldSide lado = commander.getFieldSide();
+		EFieldSide lado =  getPlayerPerception().getSide();
 		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
 		Vector2D ballPos = fieldPerception.getBall().getPosition();
 		Vector2D posicao = null;
@@ -363,11 +376,12 @@ public class HabilidadeJogador {
 			virarParaPonto(golAdv);
 			commander.doKickBlocking(100, 0);
 		}else
-			commander.doKickBlocking(100,  golAdv.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection()));
+			//commander.doKickBlocking(100,  golAdv.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection()));
+			commander.doKickToPointBlocking(100, golAdv);
 	}
 	
 	public void conduzirBola() {
-		double intensidade = 10;
+		double intensidade = 15;
 		Vector2D golAdv = localGol(EFieldSide.invert(ladoCampo()));
 		PlayerPerception adversario = pegarJogadorPerto(posBola, EFieldSide.invert(ladoCampo()), true);
 		double relativeAngle = golAdv.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection());
@@ -481,5 +495,46 @@ public class HabilidadeJogador {
 			}
 		}
 		return penutimoJogador;
+	}
+	
+	public Vector2D melhorPontoLancarBola() {
+		double pesoPontoGol = 20;
+		double pesoPontoBola = 10;
+		double pesoPontoJogador = 10;
+		double pesoPontoJogadorOutros = 25;
+		double pesoJogadorAdversarioPertoPonto = 18;
+		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros + pesoJogadorAdversarioPertoPonto;
+		EFieldSide lado =  getPlayerPerception().getSide();
+		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
+		Vector2D ballPos = fieldPerception.getBall().getPosition();
+		Vector2D posicao = null;
+		double melhorPontuacao = -1;
+		for(Vector2D p: posicoes) {
+			double distanciaBola = ballPos.distanceTo(p);
+			if(distanciaBola < 40 && distanciaBola > 20) {
+				double tempPontos = 0;
+				tempPontos += pesoPontoGol * (120 - p.distanceTo(golAdv));
+				tempPontos += pesoPontoBola * (120 - distanciaBola);
+				tempPontos += pesoPontoJogador * (120 - distaniciaMediaJogadoresPonto(p, 1));
+				tempPontos += pesoPontoJogadorOutros * distaniciaMediaJogadoresPonto(p,2);
+				tempPontos += pesoJogadorAdversarioPertoPonto * pegarJogadorPerto(p, EFieldSide.invert(lado), true).getPosition().distanceTo(p);
+				tempPontos /= somaPesos;
+				//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
+				//	System.out.println(p + " " + pesoPontoGol *  (120 - p.distanceTo(golAdv) )+ " " + pesoPontoBola *(120 - distanciaBola) + " " + pesoPontoJogador * (120 - distaniciaMediaJogadoresPonto(p, 1)) + " " +pesoPontoJogadorOutros *  distaniciaMediaJogadoresPonto(p,2));
+				if(tempPontos > melhorPontuacao) {
+					melhorPontuacao = tempPontos;
+					posicao = p;
+				}
+			}
+		}
+		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
+		//	System.out.println("\n" + posicao + "\n");
+		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
+		//	System.out.println(posicao);
+		System.out.println(melhorPontuacao);
+		if(melhorPontuacao > 63)
+			return posicao;
+		else 
+			return null;
 	}
 }
