@@ -258,6 +258,7 @@ public class HabilidadeJogador {
 		double relativeAngle = ponto.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection());
 		double deslocamento = playerPerception.getPosition().distanceTo(ponto);
 		double intensity = (deslocamento*CONST_PASSE);
+		ajeitar =  false;
 		if (ajeitar) {
 			if(pegarJogadorPerto(posBola, EFieldSide.invert(ladoCampo()), true).getPosition().distanceTo(posBola) > 5)
 				intensity = 5;
@@ -265,8 +266,6 @@ public class HabilidadeJogador {
 		else
 		if (intensity > 100)
 			intensity = 100;
-		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT))
-		//	System.out.println(playerPerception.getUniformNumber() + " " + playerPerception.getPosition() + " " + ponto);
 		commander.doKickBlocking(intensity, relativeAngle);
 	}
 	
@@ -333,7 +332,7 @@ public class HabilidadeJogador {
 		double pesoPontoJogadorOutros = 25;
 		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros;
 		EFieldSide lado =  getPlayerPerception().getSide();
-		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
+		Vector2D golAdv = localGol(EFieldSide.invert(ladoCampo()));
 		Vector2D ballPos = fieldPerception.getBall().getPosition();
 		Vector2D posicao = null;
 		double melhorPontuacao = -1;
@@ -422,8 +421,7 @@ public class HabilidadeJogador {
 		double pesoPontoBola = teste + 25;
 		double pesoPontoJogadorOutros = teste + 25;
 		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros + pesoPontoJogadorMeu;
-		EFieldSide lado = ladoCampo();
-		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
+		Vector2D golAdv = localGol(EFieldSide.invert(ladoCampo()));
 		Vector2D ballPos = posBola;
 		Vector2D posicao = null;
 		double melhorPontuacao = -1;
@@ -441,11 +439,8 @@ public class HabilidadeJogador {
 					melhorPontuacao = tempPontos;
 					posicao = p;
 				}
-			//}
+			
 		}
-		//if(getPlayerPerception().getTeam().equals("B18"))
-		//	System.out.println(playerPerception.getUniformNumber()+" "+posicao);
-		//System.out.println(posicao);
 		return posicao;
 	}
 		 
@@ -498,14 +493,14 @@ public class HabilidadeJogador {
 	}
 	
 	public Vector2D melhorPontoLancarBola() {
-		double pesoPontoGol = 20;
+		double pesoPontoGol = 30;
 		double pesoPontoBola = 10;
 		double pesoPontoJogador = 10;
 		double pesoPontoJogadorOutros = 25;
-		double pesoJogadorAdversarioPertoPonto = 18;
+		double pesoJogadorAdversarioPertoPonto = 15;
 		double somaPesos = pesoPontoGol + pesoPontoBola + pesoPontoJogador + pesoPontoJogadorOutros + pesoJogadorAdversarioPertoPonto;
 		EFieldSide lado =  getPlayerPerception().getSide();
-		Vector2D golAdv = (new Vector2D(50,0)).multiply(lado.value());
+		Vector2D golAdv = localGol(EFieldSide.invert(ladoCampo()));
 		Vector2D ballPos = fieldPerception.getBall().getPosition();
 		Vector2D posicao = null;
 		double melhorPontuacao = -1;
@@ -520,7 +515,7 @@ public class HabilidadeJogador {
 				tempPontos += pesoJogadorAdversarioPertoPonto * pegarJogadorPerto(p, EFieldSide.invert(lado), true).getPosition().distanceTo(p);
 				tempPontos /= somaPesos;
 				//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
-				//	System.out.println(p + " " + pesoPontoGol *  (120 - p.distanceTo(golAdv) )+ " " + pesoPontoBola *(120 - distanciaBola) + " " + pesoPontoJogador * (120 - distaniciaMediaJogadoresPonto(p, 1)) + " " +pesoPontoJogadorOutros *  distaniciaMediaJogadoresPonto(p,2));
+				//System.out.println(p + " " + pesoPontoGol *  (120 - p.distanceTo(golAdv) )+ " " + pesoPontoBola *(120 - distanciaBola) + " " + pesoPontoJogador * (120 - distaniciaMediaJogadoresPonto(p, 1)) + " " +pesoPontoJogadorOutros *  distaniciaMediaJogadoresPonto(p,2));
 				if(tempPontos > melhorPontuacao) {
 					melhorPontuacao = tempPontos;
 					posicao = p;
@@ -529,10 +524,12 @@ public class HabilidadeJogador {
 		}
 		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
 		//	System.out.println("\n" + posicao + "\n");
-		//if(getPlayerPerception().getSide().equals(EFieldSide.LEFT) && getPlayerPerception().getUniformNumber() == 5)
-		//	System.out.println(posicao);
-		System.out.println(melhorPontuacao);
-		if(melhorPontuacao > 63)
+		if(getPlayerPerception().getSide().equals(EFieldSide.RIGHT) && getPlayerPerception().getUniformNumber() == 5) {
+			System.out.println(posicao);
+			System.out.println(melhorPontuacao);
+		}
+		//System.out.println(melhorPontuacao);
+		if(melhorPontuacao > 70)
 			return posicao;
 		else 
 			return null;
