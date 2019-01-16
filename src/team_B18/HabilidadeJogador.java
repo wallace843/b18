@@ -23,6 +23,8 @@ public class HabilidadeJogador {
 	private Vector2D posBola;
 	private Vector2D velBola;
 	private Vector2D PFABola;
+	private Vector2D posPlayer;
+	private Vector2D velPlayer;
 	private long time;
 	
 	public HabilidadeJogador(PlayerCommander commander) {
@@ -38,6 +40,8 @@ public class HabilidadeJogador {
 		this.posBola = new Vector2D(0,0);
 		this.velBola = posBola;
 		this.PFABola = posBola;
+		this.posPlayer = posBola;
+		this.velPlayer = posBola;
 		this.time = System.currentTimeMillis();
 	}
 	
@@ -54,8 +58,12 @@ public class HabilidadeJogador {
 		fieldPerception = commander.perceiveFieldBlocking();
 		matchPerception = commander.perceiveMatchBlocking();
 		Vector2D posBolaAtual = fieldPerception.getBall().getPosition();
+		Vector2D posPlayerAtual = playerPerception.getPosition();
 		velBola = posBolaAtual.sub(posBola);
 		posBola = posBolaAtual;
+		velPlayer = posPlayerAtual.sub(posPlayer);
+		posPlayer = posPlayerAtual;
+		
 		time = System.currentTimeMillis() - time;
 	}
 	
@@ -87,7 +95,7 @@ public class HabilidadeJogador {
 			if(intervalo == Double.MAX_VALUE)
 				pontoFuturo = PFABola;
 			else {
-				double espacoPercorrido = velBola.magnitude()*intervalo - 0.01*Math.pow(intervalo, 2)/2;
+				double espacoPercorrido = velBola.magnitude()*intervalo + desaceleracaoBola*Math.pow(intervalo, 2)/2;
 				//espacoPercorridoParada = espacoPercorridoParada*7/10;
 				pontoFuturo = velBola.multiply(espacoPercorrido/(velBola.magnitude()));
 				pontoFuturo = posicaoBola.sum(pontoFuturo);	
@@ -106,10 +114,10 @@ public class HabilidadeJogador {
 		double x2 = velBola.getX();
 		double y2 = velBola.getY();
 		
-		vA = 1d;
+		vA = velPlayer.magnitude() != 0d ? velPlayer.magnitude(): 0.1;
 		vB = velBola.magnitude();
 		csTeta = (x1*x2 + y1*y2)/(Math.sqrt(Math.pow(x2, 2)+Math.pow(y2, 2))*Math.sqrt(Math.pow(x1, 2)+Math.pow(y1, 2)));
-		ac = -0.01;//desaceleracaoBola;//desaceleracaoBola;
+		ac = desaceleracaoBola;//desaceleracaoBola;
 		dis = playerPerception.getPosition().distanceTo(posBola);
 		
 		double a, b, c, d, e;
@@ -357,13 +365,12 @@ public class HabilidadeJogador {
 			
 	}
 	
-	public void chutarNoGol() {
-		Vector2D golAdv = localGol(EFieldSide.invert(ladoCampo()));
-		if(estaAlinhadoPonto(golAdv, 20)) {
+	public void chutarNoGol(Vector2D golAdv) {
+		if(!estaAlinhadoPonto(golAdv, 20)) {
 			virarParaPonto(golAdv);
 			commander.doKickBlocking(100, 0);
 		}else
-			commander.doKickBlocking(100,  golAdv.sub(playerPerception.getPosition()).angleFrom(playerPerception.getDirection()));
+			commander.doKickToPointBlocking(100,  golAdv);
 	}
 	
 	public void conduzirBola() {

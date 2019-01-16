@@ -15,8 +15,8 @@ public class DefensorDireito extends JogadorBase{
 		habilidade.posicaoInicial(new Vector2D(-20,5));
 	}
 	
-	public void playOnAcao() {
+	/*public void playOnAcao() {
 		if(habilidade.getPlayerPerception().getSide().equals(EFieldSide.LEFT))
 			habilidade.correrParaPonto(habilidade.pegarPontoFuturo());
-	}
+	}*/
 }

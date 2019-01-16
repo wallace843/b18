@@ -41,7 +41,7 @@ public class JogadorBase {
 	
 	public void beforeKickOffAcao() {}
 	
-	public void playOnAcao() {/*
+	public void playOnAcao() {
 		switch (ESTADO) {
 		case CHUTAR_BOLA:
 			estadoChutarBola();
@@ -62,7 +62,7 @@ public class JogadorBase {
 			break;
 		default:
 			break;
-		}*/
+		}
 	}
 	
 	public void kickOffLeftAcao() {
@@ -83,18 +83,21 @@ public class JogadorBase {
 		PlayerPerception jogador = habilidade.getPlayerPerception();
 		Vector2D golAdversario = habilidade.localGol(EFieldSide.invert(habilidade.ladoCampo()));
 		double distanciaGolAdversario = golAdversario.distanceTo(habilidade.getPosBola());
-		if(distanciaGolAdversario < 25) {
-			habilidade.chutarNoGol();
+		if(habilidade.getPlayerPerception().getSide().equals(EFieldSide.RIGHT))
+		System.out.println(distanciaGolAdversario);
+		if(distanciaGolAdversario < 30) {
+			System.out.println("chutar");
+			habilidade.chutarNoGol(golAdversario);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;
-		}else if (distanciaGolAdversario < 35 && 
+		}/*else if (distanciaGolAdversario < 35 && 
 				habilidade.pegarJogadorPerto(jogador.getPosition(),
 						EFieldSide.invert(jogador.getSide()), false)
 				.getPosition().distanceTo(golAdversario) > distanciaGolAdversario) {
 			habilidade.chutarNoGol();
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;
-		}else if(informacao.getPosicaoLancamento() != null) {
+		}*/else if(informacao.getPosicaoLancamento() != null) {
 			habilidade.passarBola(informacao.getPosicaoLancamento());
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;

@@ -16,7 +16,7 @@ public class Fixo extends JogadorBase{
 	}
 	
 	public void kickOffLeftAcao() {
-		Vector2D passe = new Vector2D(-10,0);//habilidade.getFieldPerception().getTeamPlayer(habilidade.ladoCampo(), 5).getPosition();
+		Vector2D passe = new Vector2D(-50,0);//habilidade.getFieldPerception().getTeamPlayer(habilidade.ladoCampo(), 5).getPosition();
 		if(habilidade.ladoCampo() == EFieldSide.LEFT) {
 			habilidade.passarBola(passe);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;	
