@@ -1,10 +1,11 @@
 Exception: STATUS_ACCESS_VIOLATION at eip=00529A01
-eax=01296B98 ebx=FFFFFFF0 ecx=01158440 edx=00000000 esi=0082C8C8 edi=0052BC30
-ebp=0082C8D4 esp=0082C88C program=C:\Users\wallace\Google Drive\meusProjetos\b18\tools\rcssserver-14.0.3-win\rcssserver.exe, pid 11768, thread main
+eax=039C4708 ebx=FFFFFFF0 ecx=038C8448 edx=00000000 esi=0082C8D8 edi=0052BC30
+ebp=0082C8E4 esp=0082C89C program=C:\Users\Elal\Documents\Eclipse Projects\b18-master\tools\rcssserver-14.0.3-win\rcssserver.exe, pid 9444, thread main
 cs=0023 ds=002B es=002B fs=0053 gs=002B ss=002B
 Stack trace:
 Frame     Function  Args
-0082C8D4  00529A01  (00000020, 00000028, 012544F0, 0082C988)
-0082C994  0052BC99  (01254AE0, 01254AE0, 012544F0, 0082C9D8)
- 507768 [main] rcssserver 11768 exception::handle: Exception: STATUS_ACCESS_VIOLATION
- 563406 [main] rcssserver 11768 exception::handle: Error while dumping state (probably corrupted stack)
+0082C8E4  00529A01  (00000020, 0082C970, 005DC4F8, 0082C988)
+0082C994  0052BC99  (405E0000, 039C4660, 039C4660, 0082C9D8)
+005DC4F8  00000000  (675F6D61, 68706172, 005F6369, 0072006C)
+  48729 [main] rcssserver 9444 exception::handle: Exception: STATUS_ACCESS_VIOLATION
+  49982 [main] rcssserver 9444 exception::handle: Error while dumping state (probably corrupted stack)

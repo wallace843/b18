@@ -18,7 +18,7 @@ public class Fixo extends JogadorBase{
 	public void kickOffLeftAcao() {
 		Vector2D passe = new Vector2D(-50,0);//habilidade.getFieldPerception().getTeamPlayer(habilidade.ladoCampo(), 5).getPosition();
 		if(habilidade.ladoCampo() == EFieldSide.LEFT) {
-			habilidade.passarBola(passe);
+			habilidade.passarBola(passe,false);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;	
 		}else
 			ESTADO = JogadorEstado.POSICIONAR_DEFESA;
@@ -27,7 +27,7 @@ public class Fixo extends JogadorBase{
 	public void kickOffRightAcao() {
 		Vector2D passe = habilidade.getFieldPerception().getTeamPlayer(habilidade.ladoCampo(), 5).getPosition();
 		if(habilidade.ladoCampo() == EFieldSide.RIGHT) {
-			habilidade.passarBola(passe);
+			habilidade.passarBola(passe,false);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;	
 		}else
 			ESTADO = JogadorEstado.POSICIONAR_DEFESA;

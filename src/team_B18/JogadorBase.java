@@ -1,9 +1,12 @@
 package team_B18;
 
+import java.util.ArrayList;
+
 import simple_soccer_lib.PlayerCommander;
 import simple_soccer_lib.perception.PlayerPerception;
 import simple_soccer_lib.utils.EFieldSide;
 import simple_soccer_lib.utils.Vector2D;
+import java.awt.Rectangle;
 
 public class JogadorBase {
 	private InformacaoTime informacao;
@@ -14,6 +17,7 @@ public class JogadorBase {
 		this.informacao = informacao;
 		this.habilidade = new HabilidadeJogador(commander);
 	}
+	
 
 	public void acao() {
 		habilidade.atualizarPercepcoes();			
@@ -33,6 +37,66 @@ public class JogadorBase {
 			break;
 		case KICK_OFF_RIGHT:
 			kickOffRightAcao();
+			break;
+		case KICK_IN_LEFT:
+			freeKickLeftAcao();
+			break;
+		case KICK_IN_RIGHT:
+			freeKickRightAcao();
+			break;
+		case FREE_KICK_LEFT:
+			freeKickLeftAcao();
+			break;
+		case FREE_KICK_RIGHT:
+			freeKickRightAcao();
+			break;
+		case CORNER_KICK_LEFT:
+			beforeKickOffAcao();
+			break;
+		case CORNER_KICK_RIGHT:
+			beforeKickOffAcao();
+			break;
+		case GOAL_KICK_LEFT:
+			goalKickLeftAcao();
+			break;
+		case GOAL_KICK_RIGHT:
+			goalKickRightAcao();
+			break;
+		case AFTER_GOAL_LEFT:
+			beforeKickOffAcao();
+			break;
+		case AFTER_GOAL_RIGHT:
+			beforeKickOffAcao();
+			break;
+		case DROP_BALL:
+			beforeKickOffAcao();
+			break;
+		case OFFSIDE_LEFT:
+			beforeKickOffAcao();
+			break;
+		case OFFSIDE_RIGHT:
+			beforeKickOffAcao();
+			break;
+		case MAX:
+			beforeKickOffAcao();
+			break;
+		case BACK_PASS_LEFT:
+			beforeKickOffAcao();
+			break;
+		case BACK_PASS_RIGHT:
+			beforeKickOffAcao();
+			break;
+		case FREE_KICK_FAULT_LEFT:
+			beforeKickOffAcao();
+			break;
+		case FREE_KICK_FAULT_RIGHT:
+			beforeKickOffAcao();
+			break;
+		case INDIRECT_FREE_KICK_LEFT:
+			beforeKickOffAcao();
+			break;
+		case INDIRECT_FREE_KICK_RIGHT:
+			beforeKickOffAcao();
 			break;
 		default:
 			break;
@@ -79,26 +143,55 @@ public class JogadorBase {
 			ESTADO = JogadorEstado.POSICIONAR_DEFESA;
 	}
 	
-	public void estadoChutarBola() {
+	public void goalKickLeftAcao() {}
+	
+	public void goalKickRightAcao() {}
+
+	public void freeKickLeftAcao() {
+		
 		PlayerPerception jogador = habilidade.getPlayerPerception();
+		Vector2D posBola = habilidade.getPosBola();
+		
+		if(jogador.getSide() == EFieldSide.LEFT)
+		{
+			if(habilidade.pegarJogadorPerto(posBola, jogador.getSide(), false).getUniformNumber() == jogador.getUniformNumber())
+			{
+				habilidade.correrParaPonto(posBola);
+				ESTADO = JogadorEstado.CHUTAR_BOLA;
+			}
+		}
+	}
+	
+	public void freeKickRightAcao() {
+		
+		PlayerPerception jogador = habilidade.getPlayerPerception();
+		Vector2D posBola = habilidade.getPosBola();
+		
+		if(jogador.getSide() == EFieldSide.RIGHT)
+		{
+			if(habilidade.pegarJogadorPerto(posBola, jogador.getSide(), false).getUniformNumber() == jogador.getUniformNumber())
+			{
+				habilidade.correrParaPonto(posBola);
+				ESTADO = JogadorEstado.CHUTAR_BOLA;
+			}
+		}
+	}
+	
+	public void estadoChutarBola() {
 		Vector2D golAdversario = habilidade.localGol(EFieldSide.invert(habilidade.ladoCampo()));
 		double distanciaGolAdversario = golAdversario.distanceTo(habilidade.getPosBola());
-		if(habilidade.getPlayerPerception().getSide().equals(EFieldSide.RIGHT))
-		System.out.println(distanciaGolAdversario);
+		Vector2D melhorLancamento = habilidade.melhorPontoLancarBola();
+		//if(habilidade.getPlayerPerception().getSide().equals(EFieldSide.RIGHT)){}
+		//	System.out.println(distanciaGolAdversario);
 		if(distanciaGolAdversario < 30) {
-			System.out.println("chutar");
-			habilidade.chutarNoGol(golAdversario);
-			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
-			return;
-		}/*else if (distanciaGolAdversario < 35 && 
-				habilidade.pegarJogadorPerto(jogador.getPosition(),
-						EFieldSide.invert(jogador.getSide()), false)
-				.getPosition().distanceTo(golAdversario) > distanciaGolAdversario) {
 			habilidade.chutarNoGol();
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;
-		}*/else if(informacao.getPosicaoLancamento() != null) {
-			habilidade.passarBola(informacao.getPosicaoLancamento());
+		}else if(melhorLancamento != null) {
+			informacao.setPosicaoLancamento(melhorLancamento);
+			habilidade.passarBola(melhorLancamento,true);
+			habilidade.correrParaPonto(habilidade.getPosBola());
+			habilidade.passarBola(melhorLancamento, false);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;
 		}else if(habilidade.pegarJogadorPerto(
@@ -111,9 +204,20 @@ public class JogadorBase {
 			Vector2D melhorPosicao = habilidade.melhorPontoPassarBola();
 			PlayerPerception jogadorMelhorPosicionado = habilidade.jogadorBemPosicionado(melhorPosicao);
 			if(jogadorMelhorPosicionado == null) {
-				habilidade.passarBola(golAdversario);
-			}else
-				habilidade.passarBola(jogadorMelhorPosicionado.getPosition());
+				habilidade.passarBola(golAdversario,true);
+				habilidade.correrParaPonto(habilidade.getPosBola());
+				habilidade.passarBola(golAdversario, false);
+			}else {
+				if(habilidade.getPosBola().distanceTo(habilidade.localGol(habilidade.ladoCampo())) > 30) {
+					habilidade.passarBola(jogadorMelhorPosicionado.getPosition(),true);
+					habilidade.correrParaPonto(habilidade.getPosBola());
+					habilidade.passarBola(jogadorMelhorPosicionado.getPosition(), false);
+				}else {
+					habilidade.passarBola(golAdversario,true);
+					habilidade.correrParaPonto(habilidade.getPosBola());
+					habilidade.passarBola(golAdversario, false);
+				}
+			}
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 		}
 	}
@@ -127,10 +231,15 @@ public class JogadorBase {
 		Vector2D melhorPosicao = habilidade.melhorPontoReceberBola();
 		EFieldSide ladoAdversario = EFieldSide.invert(habilidade.ladoCampo());
 		double linhaImpedimento = habilidade.penultimoJogadorAdversario().getPosition().getX();
+		
 		if(habilidade.naZonaDeChute()) {
 			ESTADO = JogadorEstado.CHUTAR_BOLA;
 			return;
-		}else if (velocidadeBola.magnitude() == 0 && habilidade.pegarJogadorPerto(posBola, ladoJogador, true).getUniformNumber() == jogador.getUniformNumber()) {
+		}else if(informacao.getPosicaoLancamento() != null) {
+			informacao.setPosicaoLancamento(null);
+			ESTADO = JogadorEstado.RECEBER_BOLA;
+		}
+		else if (velocidadeBola.magnitude() == 0 && habilidade.pegarJogadorPerto(posBola, ladoJogador, true).getUniformNumber() == jogador.getUniformNumber()) {
 			ESTADO = JogadorEstado.PERSEGUIR_BOLA;
 			return;
 		}else if (velocidadeBola.magnitude() != 0 && habilidade.pegarJogadorPerto(pontoParada, ladoJogador, true).getUniformNumber() == jogador.getUniformNumber()) {
@@ -148,27 +257,47 @@ public class JogadorBase {
 	}
 	
 	public void estadoPosicionarDefesa() {
+		Vector2D localBola = habilidade.getPosBola();
 		PlayerPerception jogador = habilidade.getPlayerPerception();
 		PlayerPerception jogadorAdv = habilidade.getFieldPerception().
-				getTeamPlayer(EFieldSide.invert(jogador.getSide()), jogador.getUniformNumber());
-		Vector2D localBola = habilidade.getPosBola();
+												 getTeamPlayer(EFieldSide.invert(jogador.getSide()), 
+														 habilidade.pegarJogadorPerto(jogador.getPosition(), EFieldSide.invert(jogador.getSide()), false).getUniformNumber());
+				//habilidade.getFieldPerception().getTeamPlayer(EFieldSide.invert(jogador.getSide()), jogador.getUniformNumber());
+				
 		if(habilidade.naZonaDeChute()) {
 			ESTADO = JogadorEstado.CHUTAR_BOLA;
 			return;
-		}else if(habilidade.pegarJogadorPerto(localBola, jogador.getSide(), true).getUniformNumber() == 
-				jogador.getUniformNumber() || jogador.getPosition().distanceTo(localBola) < 10) {
+			// se o jogador for o mais próximo da bola
+		}else if(habilidade.pegarJogadorPerto(localBola, jogador.getSide(), true).getUniformNumber() ==  
+				jogador.getUniformNumber() || jogador.getPosition().distanceTo(localBola) < 5) {
 			ESTADO = JogadorEstado.PERSEGUIR_BOLA;
 			return;
 		}else {
-			if(jogador.getPosition().distanceTo(jogadorAdv.getPosition()) > 5) {
-				habilidade.correrParaPonto(jogadorAdv.getPosition());
-			}
+			
+			//if(jogador.getPosition().distanceTo(jogadorAdv.getPosition()) > 5) 
+			   // && habilidade.pegarJogadorPerto(jogadorAdv.getPosition(), jogador.getSide(), false).getSide() != jogador.getSide()) 
+			//{
+				ArrayList<PlayerPerception> aux = habilidade.getFieldPerception().getTeamPlayers(jogadorAdv.getSide());
+				for(PlayerPerception p : aux)
+				{
+					if(p.getUniformNumber() != 1) {
+						
+						if(habilidade.pegarJogadorPerto(p.getPosition(), jogador.getSide(), false).getUniformNumber() != jogador.getUniformNumber()
+								&& habilidade.pegarJogadorPerto(p.getPosition(), jogador.getSide(), false).getPosition().distanceTo(p.getPosition()) > 4)
+						{
+							habilidade.correrParaPonto(p.getPosition());
+							break;
+						}	
+					}
+				}
+				
+			//}
 		}
 		
 		if(habilidade.emModoAtaque())
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 	}
-	
+		
 	public void estadoReceberBola() {
 		if(habilidade.naZonaDeChute())
 			ESTADO = JogadorEstado.CHUTAR_BOLA;
