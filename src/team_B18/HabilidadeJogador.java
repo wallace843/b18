@@ -174,6 +174,27 @@ public class HabilidadeJogador {
 		}
 	}
 	
+	public void correrPontoDeAgarre() {
+		Vector2D velocidade = velBola;
+		Vector2D posicaoBola = posBola;
+		double magniVelocidadeBola = velocidade.magnitude();
+		if(magniVelocidadeBola > 0) {
+			double espacoPercorridoParada = (-Math.pow(magniVelocidadeBola,2))/(2*(-1.3));
+			Vector2D pontoCorrida = velocidade.multiply(espacoPercorridoParada/(velocidade.magnitude()));
+			pontoCorrida = posicaoBola.sum(pontoCorrida);
+			if (!estaAlinhadoPonto(pontoCorrida, 15)) 
+				virarParaPonto(pontoCorrida);
+			if(playerPerception.getPosition().distanceTo(pontoCorrida) > 1) 
+				commander.doDash(100);
+		}
+		else {
+			if (!estaAlinhadoPonto(posicaoBola, 15)) 
+				virarParaPonto(posicaoBola);
+			if(playerPerception.getPosition().distanceTo(posicaoBola) > 1) 
+				commander.doDash(100);
+		}
+	}
+	
 	public void posicaoInicial(Vector2D inicio) {
 		commander.doMoveBlocking(inicio.getX(), inicio.getY());
 	}

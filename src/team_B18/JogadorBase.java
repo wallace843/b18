@@ -184,7 +184,7 @@ public class JogadorBase {
 		//if(habilidade.getPlayerPerception().getSide().equals(EFieldSide.RIGHT)){}
 		//	System.out.println(distanciaGolAdversario);
 		if(distanciaGolAdversario < 30) {
-			habilidade.chutarNoGol();
+			habilidade.chutarNoGol(golAdversario);
 			ESTADO = JogadorEstado.POSICIONAR_ATAQUE;
 			return;
 		}else if(melhorLancamento != null) {
